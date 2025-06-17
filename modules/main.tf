@@ -91,8 +91,8 @@ resource "aws_iam_role_policy" "frontend_build_policy" {
           "s3:ListBucket"
         ],
         Resource = [
-          "arn:aws:s3:::${var.bucket_name}",
-          "arn:aws:s3:::${var.bucket_name}/*"
+          "arn:aws:s3:::*",
+
         ]
       },
       {
@@ -190,8 +190,8 @@ resource "aws_iam_role_policy" "frontend_pipeline_policy" {
           "s3:GetBucketVersioning"
         ],
         Resource = [
-          "arn:aws:s3:::${var.bucket_name}-pipeline",
-          "arn:aws:s3:::${var.bucket_name}-pipeline/*"
+          "arn:aws:s3:::*",
+
         ]
       },
 
