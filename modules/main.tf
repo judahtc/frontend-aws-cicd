@@ -59,6 +59,92 @@ resource "aws_s3_bucket_website_configuration" "s3_website_config" {
 
 }
 
+resource "aws_iam_role" "frontend_build_role" {
+  name = "frontend-build-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [{
+      Effect = "Allow",
+      Principal = {
+        Service = "codebuild.amazonaws.com"
+      },
+      Action = "sts:AssumeRole"
+    }]
+  })
+}
+
+resource "aws_iam_role_policy" "frontend_build_policy" {
+  role = aws_iam_role.frontend_build_role.name
+
+  name = "frontend-build-policy"
+
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Action = [
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:ListBucket"
+        ],
+        Resource = [
+          "arn:aws:s3:::${var.bucket_name}",
+          "arn:aws:s3:::${var.bucket_name}/*"
+        ]
+      },
+      {
+        Effect = "Allow",
+        Action = [
+          "logs:CreateLogGroup",
+          "logs:CreateLogStream",
+          "logs:PutLogEvents"
+        ],
+        Resource = "*"
+      }
+    ]
+  })
+}
+
+
+
+
+
+resource "aws_codebuild_project" "lambda_build_project" {
+  name         = "${var.bucket_name}-build"
+  service_role = aws_iam_role.frontend_build_role.arn
+
+  source {
+    type      = "CODEPIPELINE"
+    buildspec = "buildspec.yml"
+  }
+
+  artifacts {
+    type = "CODEPIPELINE"
+  }
+
+  environment {
+    compute_type    = "BUILD_GENERAL1_SMALL"
+    image           = "aws/codebuild/standard:7.0"
+    type            = "LINUX_CONTAINER"
+    privileged_mode = true
+  }
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_pipeline_policy_attach" {
+  role       = aws_iam_role.frontend_pipeline_iam_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AWSCodePipeline_FullAccess"
+}
+
+
+
+
+resource "aws_iam_role_policy_attachment" "pipeline_codebuild_dev_access" {
+  role       = aws_iam_role.frontend_pipeline_iam_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AWSCodeBuildDeveloperAccess"
+}
 
 resource "aws_iam_role" "frontend_pipeline_iam_role" {
   name = "frontend-pipeline-role"
@@ -134,6 +220,12 @@ resource "aws_iam_role_policy" "frontend_pipeline_policy" {
 }
 
 
+resource "aws_s3_bucket" "pipeline_artifacts" {
+  bucket        = "${var.bucket_name}-${var.aws_region}-pipeline-artifacts"
+  force_destroy = true
+}
+
+
 resource "aws_codepipeline" "frontend_codepipeline" {
   name     = "${var.bucket_name}-pipeline"
   role_arn = aws_iam_role.frontend_pipeline_iam_role.arn
@@ -180,29 +272,10 @@ resource "aws_codepipeline" "frontend_codepipeline" {
 
 
         EnvironmentVariables = jsonencode([
+
           {
-            name  = "AWS_ACCOUNT_ID"
-            value = data.aws_caller_identity.current.account_id
-            type  = "PLAINTEXT"
-          },
-          {
-            name  = "AWS_DEFAULT_REGION"
-            value = var.aws_region
-            type  = "PLAINTEXT"
-          },
-          {
-            name  = "IMAGE_REPO_NAME"
-            value = "${var.bucket_name}_repo"
-            type  = "PLAINTEXT"
-          },
-          {
-            name  = "IMAGE_TAG"
-            value = "latest"
-            type  = "PLAINTEXT"
-          },
-          {
-            name  = "FUNCTION_NAME"
-            value = var.bucket_name
+            name  = "MODE"
+            value = "prod"
             type  = "PLAINTEXT"
           }
         ])
@@ -210,7 +283,7 @@ resource "aws_codepipeline" "frontend_codepipeline" {
     }
   }
 
-  
+
   stage {
     name = "Deploy"
 
