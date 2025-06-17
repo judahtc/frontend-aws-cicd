@@ -9,6 +9,9 @@ variable "bucket_name" {
 variable "git_branch" {
 
 }
+variable "connectionArn" {
+
+}
 
 variable "full_repository_id" {
 

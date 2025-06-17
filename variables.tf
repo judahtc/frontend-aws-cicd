@@ -17,6 +17,10 @@ variable "full_repository_id" {
   description = "Full GitHub repository ID (e.g., org/repo)"
   type        = string
 }
+variable "connectionArn" {
+  description = "aws github connector ARN from aws"
+  type        = string
+}
 
 variable "env" {
   description = "Environment name"

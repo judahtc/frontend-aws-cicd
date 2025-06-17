@@ -59,3 +59,80 @@ resource "aws_s3_bucket_website_configuration" "s3_website_config" {
 
 }
 
+
+resource "aws_codepipeline" "lambda_pipeline" {
+  name     = "${var.bucket_name}-pipeline"
+  role_arn = aws_iam_role.lambda_pipeline_role.arn
+
+  artifact_store {
+    location = aws_s3_bucket.pipeline_artifacts.bucket
+    type     = "S3"
+  }
+
+  stage {
+    name = "Source"
+
+    action {
+      name             = "Source"
+      category         = "Source"
+      owner            = "AWS"
+      provider         = "CodeStarSourceConnection"
+      version          = "1"
+      output_artifacts = ["source_output"]
+
+      configuration = {
+        FullRepositoryId = var.full_repository_id
+        BranchName       = var.git_branch
+        ConnectionArn    = var.connectionArn
+
+      }
+    }
+  }
+
+  stage {
+    name = "Build"
+
+    action {
+      name             = "Build"
+      category         = "Build"
+      owner            = "AWS"
+      provider         = "CodeBuild"
+      input_artifacts  = ["source_output"]
+      output_artifacts = ["build_output"]
+      version          = "1"
+
+      configuration = {
+        ProjectName = aws_codebuild_project.lambda_build_project.name
+
+
+        EnvironmentVariables = jsonencode([
+          {
+            name  = "AWS_ACCOUNT_ID"
+            value = data.aws_caller_identity.current.account_id
+            type  = "PLAINTEXT"
+          },
+          {
+            name  = "AWS_DEFAULT_REGION"
+            value = var.aws_region
+            type  = "PLAINTEXT"
+          },
+          {
+            name  = "IMAGE_REPO_NAME"
+            value = "${var.bucket_name}_repo"
+            type  = "PLAINTEXT"
+          },
+          {
+            name  = "IMAGE_TAG"
+            value = "latest"
+            type  = "PLAINTEXT"
+          },
+          {
+            name  = "FUNCTION_NAME"
+            value = var.bucket_name
+            type  = "PLAINTEXT"
+          }
+        ])
+      }
+    }
+  }
+}
