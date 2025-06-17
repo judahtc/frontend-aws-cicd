@@ -60,9 +60,83 @@ resource "aws_s3_bucket_website_configuration" "s3_website_config" {
 }
 
 
-resource "aws_codepipeline" "lambda_pipeline" {
+resource "aws_iam_role" "frontend_pipeline_iam_role" {
+  name = "frontend-pipeline-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Principal = {
+          Service = "codepipeline.amazonaws.com"
+        },
+        Action = "sts:AssumeRole"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy" "frontend_pipeline_policy" {
+  name = "frontend-pipeline-policy"
+  role = aws_iam_role.frontend_pipeline_iam_role.id
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+
+      # Allow access to CodeStar connections (GitHub)
+      {
+        Effect = "Allow",
+        Action = [
+          "codestar-connections:UseConnection"
+        ],
+        Resource = "*" # Can be restricted to specific connection ARN
+      },
+
+      # Allow access to artifacts bucket (e.g., ${var.bucket_name}-pipeline)
+      {
+        Effect = "Allow",
+        Action = [
+          "s3:GetObject",
+          "s3:GetObjectVersion",
+          "s3:PutObject",
+          "s3:GetBucketVersioning"
+        ],
+        Resource = [
+          "arn:aws:s3:::${var.bucket_name}-pipeline",
+          "arn:aws:s3:::${var.bucket_name}-pipeline/*"
+        ]
+      },
+
+      # Allow CodePipeline to trigger CodeBuild
+      {
+        Effect = "Allow",
+        Action = [
+          "codebuild:BatchGetBuilds",
+          "codebuild:StartBuild"
+        ],
+        Resource = "*"
+      },
+
+      {
+        "Effect" : "Allow",
+        "Action" : [
+          "cloudwatch:*",
+          "logs:CreateLogGroup",
+          "logs:CreateLogStream",
+          "logs:PutLogEvents"
+        ],
+        "Resource" : "*"
+      }
+    ]
+  })
+}
+
+
+resource "aws_codepipeline" "frontend_codepipeline" {
   name     = "${var.bucket_name}-pipeline"
-  role_arn = aws_iam_role.lambda_pipeline_role.arn
+  role_arn = aws_iam_role.frontend_pipeline_iam_role.arn
 
   artifact_store {
     location = aws_s3_bucket.pipeline_artifacts.bucket

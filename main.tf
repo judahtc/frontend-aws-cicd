@@ -6,6 +6,6 @@ module "s3_cf_route53" {
   git_branch         = var.git_branch
   bucket_name        = var.bucket_name
   env                = var.env
-  connectionArn = var.connectionArn
+  connectionArn      = var.connectionArn
 
 }
