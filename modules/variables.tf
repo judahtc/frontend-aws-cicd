@@ -1,23 +1,23 @@
 variable "aws_region" {
-  
+
 }
 
 variable "bucket_name" {
-  
+
 }
 
 variable "git_branch" {
-  
+
 }
 
 variable "full_repository_id" {
-  
+
 }
 
 variable "env" {
   description = "Environment name"
   type        = string
-  default     = ""
+ 
 }
 
 variable "app" {
@@ -26,7 +26,7 @@ variable "app" {
   default     = ""
 }
 
-variable "version" {
+variable "version_number" {
   description = "Version number"
   type        = string
   default     = ""

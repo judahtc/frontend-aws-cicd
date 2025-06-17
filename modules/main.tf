@@ -7,8 +7,8 @@ resource "aws_s3_bucket" "s3_website" {
   tags = {
     env     = var.env
     app     = var.app
-    version = var.version
-    stack   = var.version
+    version = var.version_number
+
   }
 
 

@@ -29,7 +29,7 @@ variable "app" {
   default     = ""
 }
 
-variable "version" {
+variable "version_number" {
   description = "Version number"
   type        = string
   default     = ""
