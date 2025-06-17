@@ -7,5 +7,4 @@ module "s3_cf_route53" {
   bucket_name = var.bucket_name
   env = var.env
   
-
 }

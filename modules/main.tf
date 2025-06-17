@@ -4,6 +4,7 @@ provider "aws" {
 
 resource "aws_s3_bucket" "s3_website" {
   bucket = var.bucket_name
+  
   tags = {
     env     = var.env
     app     = var.app
@@ -13,8 +14,15 @@ resource "aws_s3_bucket" "s3_website" {
 
 
 
+
+
 }
 
+resource "aws_s3_bucket_public_access_block" "s3_bucket_public_access_block" {
+  bucket = aws_s3_bucket.s3_website.id
+  block_public_policy = false
+  
+}
 resource "aws_s3_bucket_policy" "s3_bucket_policy" {
   bucket = aws_s3_bucket.s3_website.id
 
