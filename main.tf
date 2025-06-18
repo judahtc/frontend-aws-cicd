@@ -7,5 +7,8 @@ module "s3_cf_route53" {
   bucket_name        = var.bucket_name
   env                = var.env
   connectionArn      = var.connectionArn
-
+  cloudfront_description = var.cloudfront_description
+  alternate_domain = var.alternate_domain
+  acm_certificate_arn = var.acm_certificate_arn
+  origin_access_identity = var.origin_access_identity
 }
