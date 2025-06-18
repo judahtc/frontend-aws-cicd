@@ -2,6 +2,11 @@ provider "aws" {
   region = var.aws_region
 }
 
+provider "aws" {
+  alias  = "us_east_1"
+  region = "us-east-1"
+}
+
 resource "aws_s3_bucket" "s3_website" {
   bucket = var.bucket_name
 
@@ -38,7 +43,22 @@ resource "aws_s3_bucket_policy" "s3_bucket_policy" {
         Principal = "*",
         Action    = "s3:GetObject",
         Resource  = "${aws_s3_bucket.s3_website.arn}/*"
-      }
+      },
+
+             {
+            "Sid": "AllowCloudFrontServicePrincipal",
+            "Effect": "Allow",
+            "Principal": {
+                "Service": "cloudfront.amazonaws.com"
+            },
+            "Action": "s3:GetObject",
+            "Resource": "arn:aws:s3:::${var.bucket_name}/*",
+            "Condition": {
+                "StringEquals": {
+                    "AWS:SourceArn": "arn:aws:cloudfront::165194454526:distribution/*"
+                }
+            }
+        }
     ]
   })
 }
@@ -315,9 +335,7 @@ resource "aws_cloudfront_distribution" "claxon_frontend" {
     domain_name = aws_s3_bucket.s3_website.bucket_regional_domain_name
     origin_id   = "S3Origin"
 
-    s3_origin_config {
-      origin_access_identity = var.origin_access_identity
-    }
+origin_access_control_id = var.origin_access_identity
   }
 
   default_cache_behavior {
