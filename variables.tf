@@ -38,3 +38,24 @@ variable "version_number" {
   type        = string
   default     = ""
 }
+
+variable "cloudfront_description" {
+  description = "Description for the CloudFront distribution"
+  type        = string
+}
+
+variable "alternate_domain" {
+  description = "Alternate domain name (CNAME) for the CloudFront distribution (e.g. frontend.claxonfintech.com)"
+  type        = string
+}
+
+variable "origin_access_identity" {
+  description = "CloudFront origin access identity ID (e.g. origin-access-identity/cloudfront/E34JASDR0BUABPTSHSAGS)"
+  type        = string
+}
+
+variable "acm_certificate_arn" {
+  description = "ACM certificate ARN in us-east-1 for CloudFront distribution"
+  type        = string
+}
+
