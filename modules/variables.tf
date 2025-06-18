@@ -12,6 +12,20 @@ variable "git_branch" {
 variable "connectionArn" {
 
 }
+variable "cloudfront_description" {
+
+}
+variable "alternate_domain" {
+
+}
+variable "origin_access_identity" {
+
+}
+
+
+variable "acm_certificate_arn" {
+
+}
 
 variable "full_repository_id" {
 
