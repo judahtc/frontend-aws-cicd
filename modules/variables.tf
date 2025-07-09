@@ -26,6 +26,9 @@ variable "origin_access_identity" {
 variable "acm_certificate_arn" {
 
 }
+variable "backend_url" {
+
+}
 
 variable "full_repository_id" {
 
