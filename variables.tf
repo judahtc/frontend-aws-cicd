@@ -27,6 +27,11 @@ variable "env" {
   type        = string
 }
 
+variable "backend_url" {
+  description = "Vite URL(Vite API URL)"
+  type        = string
+}
+
 variable "app" {
   description = "Application name"
   type        = string
