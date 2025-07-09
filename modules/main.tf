@@ -45,20 +45,20 @@ resource "aws_s3_bucket_policy" "s3_bucket_policy" {
         Resource  = "${aws_s3_bucket.s3_website.arn}/*"
       },
 
-             {
-            "Sid": "AllowCloudFrontServicePrincipal",
-            "Effect": "Allow",
-            "Principal": {
-                "Service": "cloudfront.amazonaws.com"
-            },
-            "Action": "s3:GetObject",
-            "Resource": "arn:aws:s3:::${var.bucket_name}/*",
-            "Condition": {
-                "StringEquals": {
-                    "AWS:SourceArn": "arn:aws:cloudfront::165194454526:distribution/*"
-                }
-            }
+      {
+        "Sid" : "AllowCloudFrontServicePrincipal",
+        "Effect" : "Allow",
+        "Principal" : {
+          "Service" : "cloudfront.amazonaws.com"
+        },
+        "Action" : "s3:GetObject",
+        "Resource" : "arn:aws:s3:::${var.bucket_name}/*",
+        "Condition" : {
+          "StringEquals" : {
+            "AWS:SourceArn" : "arn:aws:cloudfront::165194454526:distribution/*"
+          }
         }
+      }
     ]
   })
 }
@@ -249,6 +249,7 @@ resource "aws_s3_bucket" "pipeline_artifacts" {
 resource "aws_codepipeline" "frontend_codepipeline" {
   name     = "${var.bucket_name}-pipeline"
   role_arn = aws_iam_role.frontend_pipeline_iam_role.arn
+  pipeline_type = "V2"
 
   artifact_store {
     location = aws_s3_bucket.pipeline_artifacts.bucket
@@ -335,7 +336,7 @@ resource "aws_cloudfront_distribution" "claxon_frontend" {
     domain_name = aws_s3_bucket.s3_website.bucket_regional_domain_name
     origin_id   = "S3Origin"
 
-origin_access_control_id = var.origin_access_identity
+    origin_access_control_id = var.origin_access_identity
   }
 
   default_cache_behavior {
@@ -391,7 +392,7 @@ origin_access_control_id = var.origin_access_identity
   http_version = "http2"
 
 
-    custom_error_response {
+  custom_error_response {
     error_code            = 403
     response_code         = 200
     response_page_path    = "/index.html"
@@ -405,8 +406,8 @@ origin_access_control_id = var.origin_access_identity
     error_caching_min_ttl = 0
   }
 
-    tags = {
-    env = var.env
+  tags = {
+    env     = var.env
     app     = var.app
     version = var.version_number
   }
