@@ -52,7 +52,7 @@ variable "alternate_domain" {
 variable "origin_access_identity" {
   description = "CloudFront origin access identity ID (e.g. origin-access-identity/cloudfront/E34JASDR0BUABPTSHSAGS)"
   type        = string
-  default = "E2BQR0BUABPTU2"
+  default     = "E2BQR0BUABPTU2"
 }
 
 variable "acm_certificate_arn" {
