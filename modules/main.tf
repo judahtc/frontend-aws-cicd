@@ -80,7 +80,7 @@ resource "aws_s3_bucket_website_configuration" "s3_website_config" {
 }
 
 resource "aws_iam_role" "frontend_build_role" {
-  name = "frontend-build-role"
+  name = "frontend-build-role-${var.bucket_name}"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17",
@@ -167,7 +167,7 @@ resource "aws_iam_role_policy_attachment" "pipeline_codebuild_dev_access" {
 }
 
 resource "aws_iam_role" "frontend_pipeline_iam_role" {
-  name = "frontend-pipeline-role"
+  name = "frontend-pipeline-role-${var.bucket_name}"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17",
