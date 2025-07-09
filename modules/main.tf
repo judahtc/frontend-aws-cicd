@@ -292,6 +292,12 @@ resource "aws_codepipeline" "frontend_codepipeline" {
             value = "prod"
             type  = "PLAINTEXT"
           }
+          ,
+        {
+          name  = "BACKEND_URL"
+          value = var.backend_url
+          type  = "PLAINTEXT"
+        }
         ])
       }
     }
