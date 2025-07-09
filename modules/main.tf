@@ -289,7 +289,7 @@ resource "aws_codepipeline" "frontend_codepipeline" {
 
           {
             name  = "MODE"
-            value = "prod"
+            value = var.env
             type  = "PLAINTEXT"
           }
           ,
