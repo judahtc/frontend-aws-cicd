@@ -44,24 +44,24 @@ resource "aws_s3_bucket_policy" "s3_bucket_policy" {
         Action    = "s3:GetObject",
         Resource  = "${aws_s3_bucket.s3_website.arn}/*"
       },
-
       {
-        "Sid" : "AllowCloudFrontServicePrincipal",
-        "Effect" : "Allow",
-        "Principal" : {
-          "Service" : "cloudfront.amazonaws.com"
+        Sid       = "AllowCloudFrontServicePrincipal",
+        Effect    = "Allow",
+        Principal = {
+          Service = "cloudfront.amazonaws.com"
         },
-        "Action" : "s3:GetObject",
-        "Resource" : "arn:aws:s3:::${var.bucket_name}/*",
-        "Condition" : {
-          "StringEquals" : {
-            "AWS:SourceArn" : "arn:aws:cloudfront::165194454526:distribution/*"
+        Action    = "s3:GetObject",
+        Resource  = "${aws_s3_bucket.s3_website.arn}/*",
+        Condition = {
+          StringEquals = {
+            "AWS:SourceArn" = aws_cloudfront_distribution.claxon_frontend.arn
           }
         }
       }
     ]
   })
 }
+
 
 
 
