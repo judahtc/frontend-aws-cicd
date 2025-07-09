@@ -11,4 +11,5 @@ module "s3_cf_route53" {
   alternate_domain       = var.alternate_domain
   acm_certificate_arn    = var.acm_certificate_arn
   origin_access_identity = var.origin_access_identity
+  backend_url = var.backend_url
 }
