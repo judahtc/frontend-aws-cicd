@@ -329,7 +329,7 @@ resource "aws_cloudfront_distribution" "claxon_frontend" {
   comment             = var.cloudfront_description
   default_root_object = "index.html"
 
-  aliases = [var.alternate_domain]
+  aliases = var.alternate_domain
 
   origin {
     domain_name = aws_s3_bucket.s3_website.bucket_regional_domain_name
