@@ -51,7 +51,7 @@ variable "cloudfront_description" {
 
 variable "alternate_domain" {
   description = "Alternate domain name (CNAME) for the CloudFront distribution (e.g. frontend.claxonfintech.com)"
-  type        = string
+  type        = list(string)
 }
 
 variable "origin_access_identity" {
